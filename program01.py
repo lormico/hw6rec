@@ -33,12 +33,50 @@ ATTENZIONE: quando caricate il file assicuratevi che sia nella codifica UTF8
 (ad esempio editatelo dentro Spyder)
 """
 
+from typing import Dict, Tuple, List
+
 import immagini
-def es1(filepng, filetxt):
-    # inserite qui il vostro codice
-    pass
+
+
+class Rectangle:
+    def __init__(self, initial_x, initial_y, color):
+        self.x_max = initial_x
+        self.x_min = initial_x
+        self.y_max = initial_y
+        self.y_min = initial_y
+        self.color = color
+
+    def add_pixel(self, x, y):
+        self.x_max = max(x, self.x_max)
+        self.x_min = min(x, self.x_min)
+        self.y_max = max(y, self.y_max)
+        self.y_min = min(y, self.y_min)
+
+    def __str__(self):
+        return "%(x_min)d %(y_min)d %(x_max)d %(y_max)d %(color)s" % self.__dict__
+
+
+def find_rectangles(picture) -> List[Rectangle]:
+    last_color = (0, 0, 0)
+    rectangle_dict: Dict[Tuple[int, int, int], Rectangle] = dict()
+
+    for y, row in enumerate(picture):
+        for x, current_color in enumerate(row):
+            if last_color != current_color:
+                if current_color not in rectangle_dict.keys():
+                    rectangle_dict[current_color] = Rectangle(
+                        x, y, current_color)
+                else:
+                    rectangle_dict[current_color].add_pixel(x, y)
+
+    return list(rectangle_dict.values())
+
+
+def es1(filepng, filetxt) -> int:
+    pic = immagini.load(filepng)
+    rectangles = find_rectangles(pic)
+    return len(rectangles)
 
 
 if __name__ == '__main__':
-    # inserite qui i vostri test
-    pass
+    es1("rettangoli_5.png", None)
