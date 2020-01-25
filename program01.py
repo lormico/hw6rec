@@ -75,6 +75,11 @@ def find_rectangles(picture) -> List[Rectangle]:
 def es1(filepng, filetxt) -> int:
     pic = immagini.load(filepng)
     rectangles = find_rectangles(pic)
+
+    with open(filetxt, 'w') as fh:
+        for rectangle in rectangles:
+            fh.write(str(rectangle) + "\n")
+
     return len(rectangles)
 
 
