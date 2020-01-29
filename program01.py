@@ -33,7 +33,7 @@ ATTENZIONE: quando caricate il file assicuratevi che sia nella codifica UTF8
 (ad esempio editatelo dentro Spyder)
 """
 
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Set
 
 import immagini
 
@@ -56,7 +56,7 @@ class Rectangle:
         return "%(x_min)d %(y_min)d %(x_max)d %(y_max)d %(color)s" % self.__dict__
 
 
-def find_rectangles(picture) -> List[Rectangle]:
+def find_rectangles_1(picture) -> List[Rectangle]:
     last_color = (0, 0, 0)
     rectangle_dict: Dict[Tuple[int, int, int], Rectangle] = dict()
 
@@ -72,16 +72,61 @@ def find_rectangles(picture) -> List[Rectangle]:
     return list(rectangle_dict.values())
 
 
+def find_rectangles_2(picture) -> Dict[Tuple[int, int, int], List[int]]:
+    last_color = (0, 0, 0)
+    rectangle_dict: Dict[Tuple[int, int, int], List[int]] = dict()
+
+    for y, row in enumerate(picture):
+        for x, current_color in enumerate(row):
+            if last_color != current_color:
+                if current_color not in rectangle_dict:
+                    rectangle_dict[current_color] = [x, y, x, y] # xmin ymin xmax ymax
+                else:
+                    curr_rect = rectangle_dict[current_color]
+                    curr_rect[0] = min(x, curr_rect[0])
+                    curr_rect[1] = min(y, curr_rect[1])
+                    curr_rect[2] = max(x, curr_rect[2])
+                    curr_rect[3] = max(y, curr_rect[3])
+
+    return rectangle_dict
+
+
+def find_rectangles_3(picture: List[List[Tuple[int, int, int]]]) -> Dict[Tuple[int, int, int], List[int]]:
+    rectangle_dict: Dict[Tuple[int, int, int], List[int]] = dict()
+
+    color_dict: Dict[Tuple[int, int, int], Dict[str, Set[int]]] = dict()
+    for y, row in enumerate(picture):
+        for x, current_color in enumerate(row):
+            color_dict.setdefault(current_color, dict()).setdefault('x', set()).add(x)
+            color_dict.setdefault(current_color, dict()).setdefault('y', set()).add(y)
+
+    for color, pixeldict in color_dict.items():
+        rectangle_dict[color] = [min(pixeldict['x']), min(pixeldict['y']), max(pixeldict['x']), max(pixeldict['y'])]
+
+    return rectangle_dict
+
+
 def es1(filepng, filetxt) -> int:
     pic = immagini.load(filepng)
-    rectangles = find_rectangles(pic)
+    
+    ## modo 1 ##
+    rectangles = find_rectangles_1(pic)
 
     with open(filetxt, 'w') as fh:
         for rectangle in rectangles:
             fh.write(str(rectangle) + "\n")
 
     return len(rectangles)
+    ############
 
+    ## modo 2 ##
+    rectangles = find_rectangles_2(pic)
+
+    with open(filetxt, 'w') as fh:
+        for color, rectangle in rectangles.items():
+            fh.write(f"{rectangle[0]} {rectangle[1]} {rectangle[2]} {rectangle[3]} {color}\n")
+
+    return len(rectangles)
 
 if __name__ == '__main__':
     import cProfile
