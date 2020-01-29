@@ -84,4 +84,20 @@ def es1(filepng, filetxt) -> int:
 
 
 if __name__ == '__main__':
-    es1("rettangoli_5.png", None)
+    import cProfile
+    # data = (  
+    #         ("appoggiata",            5),
+    #         ("rettangoli_5",          5),
+    #         ("rettangoli_10",        10),
+    #         ("rettangoli_20",        20),
+    #         ("rettangoli_grande_5",  10),
+    #         ("rettangoli_grande_10", 20),
+    #         ("rettangoli_grande_20", 40),
+    #         ("casuale_5",             5),
+    #         ("casuale_25",           25),
+    #         ("casuale_45",           45),
+    #        )
+    # for datum in data:
+    #     cProfile.run('es1(f"{datum[0]}.png", f"test_{datum[0]}.txt")')
+
+    cProfile.run('es1("casuale_45.png", f"test_casuale_45.txt")')
